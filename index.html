@@ -1,1 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAKE STUDIO</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&display=swap');
 
+    * {margin:0; padding:0; box-sizing:border-box;}
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at top left, #6c1aff, #0f0f1f, #00111f);
+      color: #fff;
+      min-height: 100vh;
+    }
+    header {
+      padding: 30px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    header p {
+      font-size: 18px;
+      font-weight: 300;
+      opacity: 0.8;
+    }
+    h2.section-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 20px 40px;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      padding: 20px 40px 60px;
+    }
+    .card {
+      background: rgba(255,255,255,0.07);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(138,43,226,0.4);
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px rgba(0,255,255,0.7);
+    }
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .card-body {
+      padding: 20px;
+    }
+    .card-body h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .card-body p {
+      font-size: 14px;
+      font-weight: 300;
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+    .price {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #ffd43b;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: linear-gradient(90deg, #ff3c3c, #ff0099);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: linear-gradient(90deg, #ff0066, #d100ff);
+    }
+
+    /* Модальное окно */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: rgba(20,20,30,0.95);
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 0 25px rgba(0,255,200,0.5);
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-content h3 {
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+    .modal-content p {
+      font-weight: 300;
+      margin-bottom: 20px;
+    }
+    .modal-content a {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #ff3c3c, #ff0099);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #fff;
+    }
+    @keyframes fadeIn {
+      from {opacity:0; transform:scale(0.9);}
+      to {opacity:1; transform:scale(1);}
+    }
+    footer {
+      text-align: center;
+      padding: 25px;
+      background: rgba(0,0,0,0.5);
+      font-size: 14px;
+    }
+    footer a {
+      color: #ff3c3c;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FAKE STUDIO</h1>
+    <p>Сборки и моды</p>
+  </header>
+
+  <h2 class="section-title">Платные сборки:</h2>
+
+  <section class="products">
+    <div class="card">
+      <img src="https://i.ibb.co/XDt4Cn8/gta-rp-characters1.jpg" alt="RADMIR RP Мод">
+      <div class="card-body">
+        <p>Сборка</p>
+        <h3>RADMIR RP Мод</h3>
+        <div class="price">500 ₽</div>
+        <div class="btn" onclick="openModal()">🛒 Купить</div>
+      </div>
+    </div>
+    <div class="card">
+      <img src="https://i.ibb.co/T2h7v2X/gta-rp-characters2.jpg" alt="RADMIR RP Форум">
+      <div class="card-body">
+        <p>Сборка</p>
+        <h3>RADMIR RP Форум</h3>
+        <div class="price">300 ₽</div>
+        <div class="btn" onclick="openModal()">🛒 Купить</div>
+      </div>
+    </div>
+    <div class="card">
+      <img src="https://i.ibb.co/dGv8z2p/gta-rp-characters3.jpg" alt="RADMIR RP Сайт">
+      <div class="card-body">
+        <p>Сборка</p>
+        <h3>RADMIR RP Сайт</h3>
+        <div class="price">400 ₽</div>
+        <div class="btn" onclick="openModal()">🛒 Купить</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Модальное окно -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>Оформление заказа</h3>
+      <p>Чтобы купить сборку — напишите в Telegram:<br><b>@fake_studios</b></p>
+      <a href="https://t.me/fake_studios" target="_blank">Перейти в Telegram</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 FAKE STUDIO. Все права защищены.</p>
+    <p><a href="#">Политика конфиденциальности</a> | <a href="#">Контакты</a></p>
+  </footer>
+
+  <script>
+    function openModal() {
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+    window.onclick = function(event) {
+      const modal = document.getElementById('modal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+  </script>
+</body>
+</html>
