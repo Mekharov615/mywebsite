@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FOND STUDIO</title>
+  <title>Дордой "Кербен"</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&display=swap');
 
@@ -27,6 +27,22 @@
       font-size: 18px;
       font-weight: 300;
       opacity: 0.8;
+    }
+    .stickers {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .stickers img {
+      width: 80px;
+      height: 80px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
     .instagram-section {
       text-align: center;
@@ -131,6 +147,7 @@
       max-width: 400px;
       box-shadow: 0 0 25px rgba(0,255,200,0.5);
       animation: fadeIn 0.3s ease;
+      position: relative;
     }
     .modal-content h3 {
       font-weight: 700;
@@ -178,53 +195,114 @@
       font-weight: 300;
       opacity: 0.9;
     }
+
+    /* Неоновый текст и кнопка */
+    .neon-text {
+      font-size: 22px;
+      color: #00fff7;
+      text-shadow:
+        0 0 5px #00fff7,
+        0 0 10px #00fff7,
+        0 0 20px #00fff7,
+        0 0 40px #00fff7;
+      margin: 20px 0;
+    }
+    .neon-btn {
+      display: inline-block;
+      padding: 12px 30px;
+      background: #00fff7;
+      color: #000;
+      font-weight: 700;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 0 10px #00fff7, 0 0 20px #00fff7, 0 0 40px #00fff7;
+      transition: 0.3s;
+    }
+    .neon-btn:hover {
+      background: #00cccc;
+      box-shadow: 0 0 15px #00cccc, 0 0 30px #00cccc;
+    }
+
+    /* Карусель */
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      gap: 20px;
+      padding: 20px;
+      scroll-snap-type: x mandatory;
+    }
+    .carousel img {
+      max-height: 300px;
+      border-radius: 15px;
+      scroll-snap-align: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>FOND STUDIO</h1>
-    <p>Сборки и моды</p>
-  </header>
-
-  <!-- Instagram Основателя -->
-  <div class="instagram-section">
-    <h2>Instagram Основателя</h2>
-    <a href="https://www.instagram.com/mexarov?igsh=ZmRncWxibjVkdTM=" target="_blank">Открыть</a>
+  <!-- Анимированные 3D стикеры (в начале) -->
+  <div class="stickers">
+    <img src="https://cdn-icons-png.flaticon.com/512/1048/1048942.png" alt="sticker">
+    <img src="https://cdn-icons-png.flaticon.com/512/1048/1048916.png" alt="sticker">
+    <img src="https://cdn-icons-png.flaticon.com/512/1048/1048930.png" alt="sticker">
   </div>
 
-  <h2 class="section-title">Платные сборки:</h2>
+  <header>
+    <h1>Дордой "Кербен"</h1>
+    <p>Обувь оптом и розница</p>
+  </header>
+
+  <!-- Контакт -->
+  <div class="instagram-section">
+    <h2>Связь с продавцом</h2>
+    <a href="http://wa.me/996999188001" target="_blank">Открыть</a>
+    <div class="neon-text">Адрес: 7 Ряд 19 Контейнер</div>
+    <a href="http://wa.me/996999188001" target="_blank" class="neon-btn">Заказать</a>
+  </div>
+
+  <h2 class="section-title">Товары:</h2>
 
   <section class="products">
-    <!-- RADMIR RP Мод -->
     <div class="card">
       <div class="card-body">
-        <h3>RADMIR RP Мод</h3>
-        <div class="price">350 ₽</div>
+        <h3>Мужские туфли</h3>
+        <div class="price">от 1200 ₽</div>
         <div class="btn" onclick="openModal()">🛒 Купить</div>
       </div>
     </div>
-
-    <!-- RADMIR RP Форум -->
     <div class="card">
       <div class="card-body">
-        <h3>RADMIR RP Форум</h3>
-        <div class="price">250 ₽</div>
+        <h3>Кроссовки</h3>
+        <div class="price">от 1500 ₽</div>
         <div class="btn" onclick="openModal()">🛒 Купить</div>
       </div>
     </div>
-
-    <!-- RADMIR RP Сайт -->
     <div class="card">
       <div class="card-body">
-        <h3>RADMIR RP Сайт</h3>
-        <div class="price">300 ₽</div>
+        <h3>Сандалии</h3>
+        <div class="price">от 1000 ₽</div>
         <div class="btn" onclick="openModal()">🛒 Купить</div>
       </div>
     </div>
   </section>
 
   <div class="description">
-    Было сделано официально студией FOND STUDIO.
+    Все товары напрямую от поставщика "Дордой Кербен".
+  </div>
+
+  <!-- Карусель -->
+  <div class="carousel">
+    <img src="your-image-1.jpg" alt="Фото 1">
+    <img src="your-image-2.jpg" alt="Фото 2">
+    <img src="your-image-3.jpg" alt="Фото 3">
+  </div>
+
+  <!-- Анимированные 3D стикеры (в конце) -->
+  <div class="stickers">
+    <img src="https://cdn-icons-png.flaticon.com/512/1048/1048942.png" alt="sticker">
+    <img src="https://cdn-icons-png.flaticon.com/512/1048/1048916.png" alt="sticker">
+    <img src="https://cdn-icons-png.flaticon.com/512/1048/1048930.png" alt="sticker">
   </div>
 
   <!-- Модальное окно -->
@@ -232,13 +310,13 @@
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
       <h3>Оформление заказа</h3>
-      <p>Чтобы купить сборку — напишите в Telegram:<br><b>@fake_studios</b></p>
-      <a href="https://t.me/fake_studios" target="_blank">Перейти в Telegram</a>
+      <p>Чтобы купить товар — напишите в WhatsApp:<br><b>+996999188001</b></p>
+      <a href="http://wa.me/996999188001" target="_blank">Перейти</a>
     </div>
   </div>
 
   <footer>
-    <p>© 2025 FOND STUDIO. Все права защищены.</p>
+    <p>© 2025 Дордой "Кербен". Все права защищены.</p>
     <p><a href="#">Политика конфиденциальности</a> | <a href="#">Контакты</a></p>
   </footer>
 
@@ -257,4 +335,4 @@
     }
   </script>
 </body>
-</html>
+  </html>
