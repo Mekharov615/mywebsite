@@ -220,47 +220,57 @@
   </footer>
 
   <script>
+    // === ИНИЦИАЛИЗАЦИЯ ХРАНИЛИЩА ===
+    function initStorage() {
+      if (!localStorage.getItem('services')) localStorage.setItem('services', '[]');
+      if (!localStorage.getItem('news')) localStorage.setItem('news', '[]');
+      if (!localStorage.getItem('team')) localStorage.setItem('team', '[]');
+      if (!localStorage.getItem('emails')) localStorage.setItem('emails', '[]');
+      if (!localStorage.getItem('likes')) localStorage.setItem('likes', '{}');
+      if (!localStorage.getItem('visitCount')) localStorage.setItem('visitCount', '0');
+      if (localStorage.getItem('snowEnabled') === null) localStorage.setItem('snowEnabled', 'true');
+    }
+
+    initStorage();
+
+    // === ФУНКЦИИ ЧТЕНИЯ/ЗАПИСИ ===
+    function getFromStorage(key) {
+      const data = localStorage.getItem(key);
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return key === 'visitCount' ? parseInt(data) || 0 : (key === 'snowEnabled' ? data === 'true' : []);
+      }
+    }
+
+    function saveToStorage(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
     // === ЗАГРУЗКА ДАННЫХ ===
-    const loadData = () => ({
-      services: JSON.parse(localStorage.getItem('services') || '[]'),
-      news: JSON.parse(localStorage.getItem('news') || '[]'),
-      team: JSON.parse(localStorage.getItem('team') || '[]'),
-      emails: JSON.parse(localStorage.getItem('emails') || '[]'),
-      likes: JSON.parse(localStorage.getItem('likes') || '{}'),
-      visitCount: parseInt(localStorage.getItem('visitCount') || '0'),
-      snowEnabled: localStorage.getItem('snowEnabled') !== 'false',
-      isLoggedIn: localStorage.getItem('adminLoggedIn') === 'true'
-    });
+    let services = getFromStorage('services');
+    let news = getFromStorage('news');
+    let team = getFromStorage('team');
+    let emails = getFromStorage('emails');
+    let likes = getFromStorage('likes');
+    let visitCount = getFromStorage('visitCount');
+    let snowEnabled = getFromStorage('snowEnabled');
+    let isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
 
-    const saveData = (data) => {
-      localStorage.setItem('services', JSON.stringify(data.services));
-      localStorage.setItem('news', JSON.stringify(data.news));
-      localStorage.setItem('team', JSON.stringify(data.team));
-      localStorage.setItem('emails', JSON.stringify(data.emails));
-      localStorage.setItem('likes', JSON.stringify(data.likes));
-      localStorage.setItem('visitCount', data.visitCount.toString());
-      localStorage.setItem('snowEnabled', data.snowEnabled.toString());
-      localStorage.setItem('adminLoggedIn', data.isLoggedIn.toString());
-    };
-
-    // === ИНИЦИАЛИЗАЦИЯ ===
-    let state = loadData();
-
-    // Посетители
+    // Увеличиваем счётчик посещений (1 раз за сессию)
     if (!sessionStorage.getItem('visited')) {
-      state.visitCount++;
+      visitCount++;
+      saveToStorage('visitCount', visitCount);
       sessionStorage.setItem('visited', 'true');
     }
-    document.getElementById('visitCount').textContent = state.visitCount.toLocaleString();
+    document.getElementById('visitCount').textContent = visitCount.toLocaleString();
 
     // === СНЕГ ===
     function initSnow() {
       const canvas = document.getElementById('snow');
-      if (!state.snowEnabled) {
-        canvas.style.display = 'none';
-        return;
-      }
-      canvas.style.display = 'block';
+      canvas.style.display = snowEnabled ? 'block' : 'none';
+      if (!snowEnabled) return;
+
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -295,7 +305,7 @@
       for (let i = 0; i < count; i++) flakes.push(new Flake());
 
       function animate() {
-        if (!state.snowEnabled) return;
+        if (!snowEnabled) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         flakes.forEach(f => { f.update(); f.draw(); });
         requestAnimationFrame(animate);
@@ -303,7 +313,7 @@
       animate();
 
       window.addEventListener('resize', () => {
-        if (state.snowEnabled) {
+        if (snowEnabled) {
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
         }
@@ -312,7 +322,8 @@
 
     // === РЕНДЕР ===
     function renderAll() {
-      renderSection('services', state.services, (item, i) => `
+      // Услуги
+      document.getElementById('services').innerHTML = services.map((item, i) => `
         <div class="card">
           ${item.photo ? `<div class="card-img"><img src="${item.photo}" alt="Фото"></div>` : ''}
           <h3 style="font-size:17px;margin:0 0 8px;">💼 ${item.title}</h3>
@@ -320,81 +331,78 @@
           <div style="font-size:13px;margin-top:10px;color:#22d3ee;">👤 ${item.author || 'Админ'}</div>
           <div class="card-actions">
             <a href="https://wa.me/996999188001" target="_blank" class="btn btn-buy">🛒 Купить</a>
-            ${state.isLoggedIn ? `<button class="btn btn-delete" data-type="service" data-index="${i}">🗑️ Удалить</button>` : ''}
+            ${isLoggedIn ? `<button class="btn btn-delete" data-type="service" data-index="${i}">🗑️ Удалить</button>` : ''}
           </div>
         </div>
-      `);
+      `).join('');
 
-      renderSection('news', state.news, (item, i) => `
+      // Новости
+      document.getElementById('news').innerHTML = news.map((item, i) => `
         <div class="card">
           ${item.photo ? `<div class="card-img"><img src="${item.photo}" alt="Фото"></div>` : ''}
           <h3 style="font-size:17px;margin:0 0 8px;">📢 ${item.title}</h3>
           <p style="color:#a9b1c6;font-size:14px;line-height:1.4;">${item.description}</p>
           <div style="font-size:13px;margin-top:10px;color:#22d3ee;">👤 ${item.author || 'Админ'}</div>
           <div class="card-actions">
-            <button class="btn btn-like ${state.likes['news-'+i] ? 'liked' : ''}" data-type="news" data-index="${i}">
-              ${state.likes['news-'+i] ? '❤️' : '🤍'} Лайк (${item.likes || 0})
+            <button class="btn btn-like ${likes['news-'+i] ? 'liked' : ''}" data-type="news" data-index="${i}">
+              ${likes['news-'+i] ? '❤️' : '🤍'} Лайк (${item.likes || 0})
             </button>
-            ${state.isLoggedIn ? `<button class="btn btn-delete" data-type="news" data-index="${i}">🗑️ Удалить</button>` : ''}
+            ${isLoggedIn ? `<button class="btn btn-delete" data-type="news" data-index="${i}">🗑️ Удалить</button>` : ''}
           </div>
         </div>
-      `);
+      `).join('');
 
-      renderSection('team', state.team, (item, i) => `
+      // Состав
+      document.getElementById('team').innerHTML = team.map((item, i) => `
         <div class="card">
           ${item.photo ? `<div class="card-img"><img src="${item.photo}" alt="Фото"></div>` : ''}
           <h3 style="font-size:17px;margin:0 0 8px;">👤 ${item.name}</h3>
           <p style="font-weight:bold;color:#22d3ee;">${item.role}</p>
           <p style="color:#a9b1c6;font-size:14px;">${item.description}</p>
-          ${state.isLoggedIn ? `<div style="margin-top:12px;"><button class="btn btn-delete" data-type="team" data-index="${i}">🗑️ Удалить</button></div>` : ''}
+          ${isLoggedIn ? `<div style="margin-top:12px;"><button class="btn btn-delete" data-type="team" data-index="${i}">🗑️ Удалить</button></div>` : ''}
         </div>
-      `);
+      `).join('');
 
-      renderSection('emails', state.emails, (item, i) => `
+      // Почты
+      document.getElementById('emails').innerHTML = emails.map((item, i) => `
         <div class="card">
           <h3 style="font-size:17px;margin:0 0 8px;">✉️ ${item.name}</h3>
           <p style="font-weight:bold;color:#fbbf24;">${item.role}</p>
           <p style="color:#a9b1c6;font-size:14px;">📧 ${item.email}</p>
-          ${state.isLoggedIn ? `<div style="margin-top:12px;"><button class="btn btn-delete" data-type="email" data-index="${i}">🗑️ Удалить</button></div>` : ''}
+          ${isLoggedIn ? `<div style="margin-top:12px;"><button class="btn btn-delete" data-type="email" data-index="${i}">🗑️ Удалить</button></div>` : ''}
         </div>
-      `);
+      `).join('');
 
-      if (state.isLoggedIn) attachDeleteListeners();
-      attachLikeListeners();
-    }
-
-    function renderSection(id, items, renderer) {
-      document.getElementById(id).innerHTML = items.map(renderer).join('');
-    }
-
-    function attachDeleteListeners() {
+      // Назначаем обработчики
       document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.onclick = () => {
           const type = btn.dataset.type;
           const index = parseInt(btn.dataset.index);
-          if (confirm('Удалить?')) {
-            if (type === 'service') state.services.splice(index, 1);
-            else if (type === 'news') state.news.splice(index, 1);
-            else if (type === 'team') state.team.splice(index, 1);
-            else if (type === 'email') state.emails.splice(index, 1);
-            saveData(state);
+          if (confirm('Точно удалить?')) {
+            if (type === 'service') services.splice(index, 1);
+            else if (type === 'news') news.splice(index, 1);
+            else if (type === 'team') team.splice(index, 1);
+            else if (type === 'email') emails.splice(index, 1);
+            saveToStorage('services', services);
+            saveToStorage('news', news);
+            saveToStorage('team', team);
+            saveToStorage('emails', emails);
             renderAll();
           }
         };
       });
-    }
 
-    function attachLikeListeners() {
       document.querySelectorAll('.btn-like').forEach(btn => {
         btn.onclick = () => {
           const type = btn.dataset.type;
           const index = parseInt(btn.dataset.index);
           const key = `news-${index}`;
-          if (state.likes[key]) return;
-          state.likes[key] = true;
-          if (!state.news[index].likes) state.news[index].likes = 0;
-          state.news[index].likes++;
-          saveData(state);
+          if (likes[key]) return;
+          likes[key] = true;
+          if (!news[index].likes) news[index].likes = 0;
+          news[index].likes++;
+          saveToStorage('likes', likes);
+          saveToStorage('news', news);
           renderAll();
         };
       });
@@ -402,10 +410,10 @@
 
     // === АДМИНКА ===
     function toggleAdminPanel(show) {
-      state.isLoggedIn = show;
+      isLoggedIn = show;
+      localStorage.setItem('adminLoggedIn', String(show));
       document.getElementById('adminPanel').style.display = show ? 'block' : 'none';
       document.getElementById('loginBtn').textContent = show ? '🚪 Выйти' : '🔒 Админка';
-      saveData(state);
       if (show) renderAdminPanel();
       renderAll();
     }
@@ -448,22 +456,22 @@
         </div>
 
         <button id="toggleSnow" class="btn" style="background:rgba(34,211,238,0.2);color:#22d3ee;border:1px solid #22d3ee;margin-top:20px;width:100%;">
-          ❄️ ${state.snowEnabled ? 'Выключить' : 'Включить'} снег
+          ❄️ ${snowEnabled ? 'Выключить' : 'Включить'} снег
         </button>
         <button id="logoutBtn" class="btn" style="background:#ef4444;color:white;margin-top:12px;width:100%;">
           🚪 Выйти
         </button>
       `;
 
-      // Назначаем обработчики
+      // Обработчики
       document.getElementById('addService').onclick = () => {
         const title = document.getElementById('serviceTitle').value.trim();
         const photo = document.getElementById('servicePhoto').value.trim();
         const desc = document.getElementById('serviceDesc').value.trim();
         const author = document.getElementById('serviceAuthor').value.trim() || 'Админ';
         if (title && desc) {
-          state.services.push({ title, photo, description: desc, author });
-          saveData(state);
+          services.push({ title, photo, description: desc, author });
+          saveToStorage('services', services);
           renderAll();
           ['serviceTitle','servicePhoto','serviceDesc'].forEach(id => document.getElementById(id).value = '');
         } else alert('Заполните название и описание');
@@ -475,8 +483,8 @@
         const desc = document.getElementById('newsDesc').value.trim();
         const author = document.getElementById('newsAuthor').value.trim() || 'Админ';
         if (title && desc) {
-          state.news.push({ title, photo, description: desc, author, likes: 0 });
-          saveData(state);
+          news.push({ title, photo, description: desc, author, likes: 0 });
+          saveToStorage('news', news);
           renderAll();
           ['newsTitle','newsPhoto','newsDesc'].forEach(id => document.getElementById(id).value = '');
         } else alert('Заполните заголовок и текст');
@@ -488,8 +496,8 @@
         const role = document.getElementById('teamRole').value.trim();
         const desc = document.getElementById('teamDesc').value.trim();
         if (name && role && desc) {
-          state.team.push({ name, photo, role, description: desc });
-          saveData(state);
+          team.push({ name, photo, role, description: desc });
+          saveToStorage('team', team);
           renderAll();
           ['teamName','teamPhoto','teamRole','teamDesc'].forEach(id => document.getElementById(id).value = '');
         } else alert('Заполните все поля');
@@ -500,16 +508,16 @@
         const role = document.getElementById('emailRole').value.trim();
         const email = document.getElementById('emailAddress').value.trim();
         if (name && role && email) {
-          state.emails.push({ name, role, email });
-          saveData(state);
+          emails.push({ name, role, email });
+          saveToStorage('emails', emails);
           renderAll();
           ['emailName','emailRole','emailAddress'].forEach(id => document.getElementById(id).value = '');
         } else alert('Заполните все поля');
       };
 
       document.getElementById('toggleSnow').onclick = () => {
-        state.snowEnabled = !state.snowEnabled;
-        saveData(state);
+        snowEnabled = !snowEnabled;
+        localStorage.setItem('snowEnabled', snowEnabled);
         initSnow();
         renderAdminPanel();
       };
@@ -518,37 +526,4 @@
     }
 
     // === ВХОД ===
-    document.getElementById('loginBtn').onclick = () => {
-      if (state.isLoggedIn) {
-        toggleAdminPanel(false);
-      } else {
-        document.getElementById('loginModal').style.display = 'flex';
-      }
-    };
-
-    document.getElementById('doLogin').onclick = () => {
-      const user = document.getElementById('loginUser').value.trim();
-      const pass = document.getElementById('loginPass').value;
-      if (user === 'Admin' && pass === 'admins123') {
-        document.getElementById('loginModal').style.display = 'none';
-        toggleAdminPanel(true);
-      } else {
-        document.getElementById('loginError').textContent = '❌ Неверный логин или пароль';
-      }
-    };
-
-    document.getElementById('loginModal').onclick = (e) => {
-      if (e.target === document.getElementById('loginModal')) {
-        document.getElementById('loginModal').style.display = 'none';
-      }
-    };
-
-    // === ЗАПУСК ===
-    initSnow();
-    renderAll();
-    if (state.isLoggedIn) {
-      toggleAdminPanel(true);
-    }
-  </script>
-</body>
-</html>
+    document.getElementById('
