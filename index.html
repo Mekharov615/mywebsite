@@ -16,14 +16,13 @@
       --like: #ff4d94;
       --delete: #ef4444;
       --email: #fbbf24;
-      --shadow: 0 20px 60px rgba(0,0,0,.55), 0 6px 18px rgba(0,0,0,.35);
       --radius-lg: 18px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow-x: hidden; }
     body {
-      font-family: 'Montserrat', system-ui, sans-serif;
+      font-family: 'Montserrat', sans-serif;
       color: #fff;
       background:
         radial-gradient(1200px 600px at 50% -10%, rgba(124,58,237,.25), transparent 60%),
@@ -50,7 +49,7 @@
     .topbar {
       position: sticky; top: 0; z-index: 50;
       backdrop-filter: blur(10px);
-      background: linear-gradient(to bottom, rgba(10,15,44,.9), rgba(10,15,44,.6));
+      background: rgba(10,15,44,0.85);
       border-bottom: 1px solid rgba(255,255,255,.08);
     }
     .brand {
@@ -82,9 +81,7 @@
       border: 1px solid rgba(255,255,255,.08);
       border-radius: var(--radius-lg);
       padding: 18px;
-      transition: transform 0.2s;
     }
-    .card:hover { transform: translateY(-4px); }
     .card-img {
       width: 100%; height: 150px; border-radius: 12px; overflow: hidden; margin-bottom: 14px;
       background: #000;
@@ -107,7 +104,6 @@
       font-size: 12px;
     }
 
-    /* Модальное окно входа */
     #loginModal {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8);
@@ -118,7 +114,7 @@
     }
     .login-form {
       background: #0f1428; padding: 28px; border-radius: 18px;
-      width: 90%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+      width: 90%; max-width: 400px;
     }
     .login-form input {
       width: 100%; padding: 14px; margin: 8px 0;
@@ -133,14 +129,12 @@
       color: #000; font-weight: bold; border: none; border-radius: 12px; font-size: 16px;
     }
 
-    /* Админ-панель */
     #adminPanel {
       background: rgba(10,15,40,0.85);
       border: 1px solid rgba(34,211,238,0.3);
       border-radius: 26px;
       padding: 24px;
       margin: 28px 0;
-      box-shadow: var(--shadow);
       display: none;
     }
     .admin-form {
@@ -208,7 +202,6 @@
     <section class="cards" id="emails"></section>
   </main>
 
-  <!-- Модальное окно входа -->
   <div id="loginModal">
     <div class="login-form">
       <h3 style="text-align:center; margin-bottom:20px; color:#fff;">👑 Вход в админ-панель</h3>
@@ -219,7 +212,6 @@
     </div>
   </div>
 
-  <!-- Админ-панель -->
   <div id="adminPanel"></div>
 
   <footer>
@@ -228,30 +220,43 @@
   </footer>
 
   <script>
-    // === ИНИЦИАЛИЗАЦИЯ ДАННЫХ ===
-    let services = JSON.parse(localStorage.getItem('services') || '[]');
-    let news = JSON.parse(localStorage.getItem('news') || '[]');
-    let team = JSON.parse(localStorage.getItem('team') || '[]');
-    let emails = JSON.parse(localStorage.getItem('emails') || '[]');
-    let likes = JSON.parse(localStorage.getItem('likes') || '{}');
-    let visitCount = parseInt(localStorage.getItem('visitCount') || '0');
-    let snowEnabled = localStorage.getItem('snowEnabled') !== 'false';
-    let isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+    // === ЗАГРУЗКА ДАННЫХ ===
+    const loadData = () => ({
+      services: JSON.parse(localStorage.getItem('services') || '[]'),
+      news: JSON.parse(localStorage.getItem('news') || '[]'),
+      team: JSON.parse(localStorage.getItem('team') || '[]'),
+      emails: JSON.parse(localStorage.getItem('emails') || '[]'),
+      likes: JSON.parse(localStorage.getItem('likes') || '{}'),
+      visitCount: parseInt(localStorage.getItem('visitCount') || '0'),
+      snowEnabled: localStorage.getItem('snowEnabled') !== 'false',
+      isLoggedIn: localStorage.getItem('adminLoggedIn') === 'true'
+    });
 
-    const WA_LINK = 'https://wa.me/996999188001';
+    const saveData = (data) => {
+      localStorage.setItem('services', JSON.stringify(data.services));
+      localStorage.setItem('news', JSON.stringify(data.news));
+      localStorage.setItem('team', JSON.stringify(data.team));
+      localStorage.setItem('emails', JSON.stringify(data.emails));
+      localStorage.setItem('likes', JSON.stringify(data.likes));
+      localStorage.setItem('visitCount', data.visitCount.toString());
+      localStorage.setItem('snowEnabled', data.snowEnabled.toString());
+      localStorage.setItem('adminLoggedIn', data.isLoggedIn.toString());
+    };
 
-    // Посещения
+    // === ИНИЦИАЛИЗАЦИЯ ===
+    let state = loadData();
+
+    // Посетители
     if (!sessionStorage.getItem('visited')) {
-      visitCount++;
-      localStorage.setItem('visitCount', visitCount.toString());
+      state.visitCount++;
       sessionStorage.setItem('visited', 'true');
     }
-    document.getElementById('visitCount').textContent = visitCount.toLocaleString();
+    document.getElementById('visitCount').textContent = state.visitCount.toLocaleString();
 
     // === СНЕГ ===
     function initSnow() {
       const canvas = document.getElementById('snow');
-      if (!snowEnabled) {
+      if (!state.snowEnabled) {
         canvas.style.display = 'none';
         return;
       }
@@ -290,7 +295,7 @@
       for (let i = 0; i < count; i++) flakes.push(new Flake());
 
       function animate() {
-        if (!snowEnabled) return;
+        if (!state.snowEnabled) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         flakes.forEach(f => { f.update(); f.draw(); });
         requestAnimationFrame(animate);
@@ -298,7 +303,7 @@
       animate();
 
       window.addEventListener('resize', () => {
-        if (snowEnabled) {
+        if (state.snowEnabled) {
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
         }
@@ -307,90 +312,100 @@
 
     // === РЕНДЕР ===
     function renderAll() {
-      renderServices();
-      renderNews();
-      renderTeam();
-      renderEmails();
-    }
-
-    function renderServices() {
-      const el = document.getElementById('services');
-      el.innerHTML = services.map((item, i) => `
+      renderSection('services', state.services, (item, i) => `
         <div class="card">
           ${item.photo ? `<div class="card-img"><img src="${item.photo}" alt="Фото"></div>` : ''}
           <h3 style="font-size:17px;margin:0 0 8px;">💼 ${item.title}</h3>
           <p style="color:#a9b1c6;font-size:14px;line-height:1.4;">${item.description}</p>
           <div style="font-size:13px;margin-top:10px;color:#22d3ee;">👤 ${item.author || 'Админ'}</div>
           <div class="card-actions">
-            <a href="${WA_LINK}" target="_blank" class="btn btn-buy">🛒 Купить</a>
-            ${isLoggedIn ? `<button class="btn btn-delete" data-type="service" data-index="${i}">🗑️ Удалить</button>` : ''}
+            <a href="https://wa.me/996999188001" target="_blank" class="btn btn-buy">🛒 Купить</a>
+            ${state.isLoggedIn ? `<button class="btn btn-delete" data-type="service" data-index="${i}">🗑️ Удалить</button>` : ''}
           </div>
         </div>
-      `).join('');
-      if (isLoggedIn) attachDeleteListeners();
-    }
+      `);
 
-    function renderNews() {
-      const el = document.getElementById('news');
-      el.innerHTML = news.map((item, i) => `
+      renderSection('news', state.news, (item, i) => `
         <div class="card">
           ${item.photo ? `<div class="card-img"><img src="${item.photo}" alt="Фото"></div>` : ''}
           <h3 style="font-size:17px;margin:0 0 8px;">📢 ${item.title}</h3>
           <p style="color:#a9b1c6;font-size:14px;line-height:1.4;">${item.description}</p>
           <div style="font-size:13px;margin-top:10px;color:#22d3ee;">👤 ${item.author || 'Админ'}</div>
           <div class="card-actions">
-            <button class="btn btn-like ${likes[`news-${i}`] ? 'liked' : ''}" data-type="news" data-index="${i}">
-              ${likes[`news-${i}`] ? '❤️' : '🤍'} Лайк (${item.likes || 0})
+            <button class="btn btn-like ${state.likes['news-'+i] ? 'liked' : ''}" data-type="news" data-index="${i}">
+              ${state.likes['news-'+i] ? '❤️' : '🤍'} Лайк (${item.likes || 0})
             </button>
-            ${isLoggedIn ? `<button class="btn btn-delete" data-type="news" data-index="${i}">🗑️ Удалить</button>` : ''}
+            ${state.isLoggedIn ? `<button class="btn btn-delete" data-type="news" data-index="${i}">🗑️ Удалить</button>` : ''}
           </div>
         </div>
-      `).join('');
-      if (isLoggedIn) attachDeleteListeners();
-      attachLikeListeners();
-    }
+      `);
 
-    function renderTeam() {
-      const el = document.getElementById('team');
-      el.innerHTML = team.map((item, i) => `
+      renderSection('team', state.team, (item, i) => `
         <div class="card">
           ${item.photo ? `<div class="card-img"><img src="${item.photo}" alt="Фото"></div>` : ''}
           <h3 style="font-size:17px;margin:0 0 8px;">👤 ${item.name}</h3>
           <p style="font-weight:bold;color:#22d3ee;">${item.role}</p>
           <p style="color:#a9b1c6;font-size:14px;">${item.description}</p>
-          ${isLoggedIn ? `<div style="margin-top:12px;"><button class="btn btn-delete" data-type="team" data-index="${i}">🗑️ Удалить</button></div>` : ''}
+          ${state.isLoggedIn ? `<div style="margin-top:12px;"><button class="btn btn-delete" data-type="team" data-index="${i}">🗑️ Удалить</button></div>` : ''}
         </div>
-      `).join('');
-      if (isLoggedIn) attachDeleteListeners();
-    }
+      `);
 
-    function renderEmails() {
-      const el = document.getElementById('emails');
-      el.innerHTML = emails.map((item, i) => `
+      renderSection('emails', state.emails, (item, i) => `
         <div class="card">
           <h3 style="font-size:17px;margin:0 0 8px;">✉️ ${item.name}</h3>
           <p style="font-weight:bold;color:#fbbf24;">${item.role}</p>
           <p style="color:#a9b1c6;font-size:14px;">📧 ${item.email}</p>
-          ${isLoggedIn ? `<div style="margin-top:12px;"><button class="btn btn-delete" data-type="email" data-index="${i}">🗑️ Удалить</button></div>` : ''}
+          ${state.isLoggedIn ? `<div style="margin-top:12px;"><button class="btn btn-delete" data-type="email" data-index="${i}">🗑️ Удалить</button></div>` : ''}
         </div>
-      `).join('');
-      if (isLoggedIn) attachDeleteListeners();
+      `);
+
+      if (state.isLoggedIn) attachDeleteListeners();
+      attachLikeListeners();
     }
 
-    function saveAll() {
-      localStorage.setItem('services', JSON.stringify(services));
-      localStorage.setItem('news', JSON.stringify(news));
-      localStorage.setItem('team', JSON.stringify(team));
-      localStorage.setItem('emails', JSON.stringify(emails));
-      localStorage.setItem('likes', JSON.stringify(likes));
-      renderAll();
+    function renderSection(id, items, renderer) {
+      document.getElementById(id).innerHTML = items.map(renderer).join('');
     }
 
+    function attachDeleteListeners() {
+      document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.onclick = () => {
+          const type = btn.dataset.type;
+          const index = parseInt(btn.dataset.index);
+          if (confirm('Удалить?')) {
+            if (type === 'service') state.services.splice(index, 1);
+            else if (type === 'news') state.news.splice(index, 1);
+            else if (type === 'team') state.team.splice(index, 1);
+            else if (type === 'email') state.emails.splice(index, 1);
+            saveData(state);
+            renderAll();
+          }
+        };
+      });
+    }
+
+    function attachLikeListeners() {
+      document.querySelectorAll('.btn-like').forEach(btn => {
+        btn.onclick = () => {
+          const type = btn.dataset.type;
+          const index = parseInt(btn.dataset.index);
+          const key = `news-${index}`;
+          if (state.likes[key]) return;
+          state.likes[key] = true;
+          if (!state.news[index].likes) state.news[index].likes = 0;
+          state.news[index].likes++;
+          saveData(state);
+          renderAll();
+        };
+      });
+    }
+
+    // === АДМИНКА ===
     function toggleAdminPanel(show) {
+      state.isLoggedIn = show;
       document.getElementById('adminPanel').style.display = show ? 'block' : 'none';
       document.getElementById('loginBtn').textContent = show ? '🚪 Выйти' : '🔒 Админка';
-      localStorage.setItem('adminLoggedIn', String(show));
-      isLoggedIn = show;
+      saveData(state);
       if (show) renderAdminPanel();
       renderAll();
     }
@@ -400,7 +415,7 @@
         <h3 style="color:#fff;font-weight:800;margin:0 0 16px;">➕ Добавить услугу</h3>
         <div class="admin-form">
           <input type="text" id="serviceTitle" placeholder="Название услуги" />
-          <input type="text" id="servicePhoto" placeholder="URL фото (https://...)" />
+          <input type="text" id="servicePhoto" placeholder="URL фото" />
           <textarea id="serviceDesc" placeholder="Описание" rows="3"></textarea>
           <input type="text" id="serviceAuthor" placeholder="Автор" value="Админ" />
           <button id="addService">Добавить</button>
@@ -433,118 +448,78 @@
         </div>
 
         <button id="toggleSnow" class="btn" style="background:rgba(34,211,238,0.2);color:#22d3ee;border:1px solid #22d3ee;margin-top:20px;width:100%;">
-          ❄️ ${snowEnabled ? 'Выключить' : 'Включить'} снег
+          ❄️ ${state.snowEnabled ? 'Выключить' : 'Включить'} снег
         </button>
         <button id="logoutBtn" class="btn" style="background:#ef4444;color:white;margin-top:12px;width:100%;">
           🚪 Выйти
         </button>
       `;
 
-      // Назначаем обработчики после рендеринга
-      document.getElementById('addService').onclick = addService;
-      document.getElementById('addNews').onclick = addNews;
-      document.getElementById('addTeam').onclick = addTeam;
-      document.getElementById('addEmail').onclick = addEmail;
-      document.getElementById('toggleSnow').onclick = () => {
-        snowEnabled = !snowEnabled;
-        localStorage.setItem('snowEnabled', snowEnabled);
-        initSnow();
-        renderAdminPanel(); // обновить текст кнопки
+      // Назначаем обработчики
+      document.getElementById('addService').onclick = () => {
+        const title = document.getElementById('serviceTitle').value.trim();
+        const photo = document.getElementById('servicePhoto').value.trim();
+        const desc = document.getElementById('serviceDesc').value.trim();
+        const author = document.getElementById('serviceAuthor').value.trim() || 'Админ';
+        if (title && desc) {
+          state.services.push({ title, photo, description: desc, author });
+          saveData(state);
+          renderAll();
+          ['serviceTitle','servicePhoto','serviceDesc'].forEach(id => document.getElementById(id).value = '');
+        } else alert('Заполните название и описание');
       };
+
+      document.getElementById('addNews').onclick = () => {
+        const title = document.getElementById('newsTitle').value.trim();
+        const photo = document.getElementById('newsPhoto').value.trim();
+        const desc = document.getElementById('newsDesc').value.trim();
+        const author = document.getElementById('newsAuthor').value.trim() || 'Админ';
+        if (title && desc) {
+          state.news.push({ title, photo, description: desc, author, likes: 0 });
+          saveData(state);
+          renderAll();
+          ['newsTitle','newsPhoto','newsDesc'].forEach(id => document.getElementById(id).value = '');
+        } else alert('Заполните заголовок и текст');
+      };
+
+      document.getElementById('addTeam').onclick = () => {
+        const name = document.getElementById('teamName').value.trim();
+        const photo = document.getElementById('teamPhoto').value.trim();
+        const role = document.getElementById('teamRole').value.trim();
+        const desc = document.getElementById('teamDesc').value.trim();
+        if (name && role && desc) {
+          state.team.push({ name, photo, role, description: desc });
+          saveData(state);
+          renderAll();
+          ['teamName','teamPhoto','teamRole','teamDesc'].forEach(id => document.getElementById(id).value = '');
+        } else alert('Заполните все поля');
+      };
+
+      document.getElementById('addEmail').onclick = () => {
+        const name = document.getElementById('emailName').value.trim();
+        const role = document.getElementById('emailRole').value.trim();
+        const email = document.getElementById('emailAddress').value.trim();
+        if (name && role && email) {
+          state.emails.push({ name, role, email });
+          saveData(state);
+          renderAll();
+          ['emailName','emailRole','emailAddress'].forEach(id => document.getElementById(id).value = '');
+        } else alert('Заполните все поля');
+      };
+
+      document.getElementById('toggleSnow').onclick = () => {
+        state.snowEnabled = !state.snowEnabled;
+        saveData(state);
+        initSnow();
+        renderAdminPanel();
+      };
+
       document.getElementById('logoutBtn').onclick = () => toggleAdminPanel(false);
-    }
-
-    function attachDeleteListeners() {
-      document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.onclick = () => {
-          const type = btn.dataset.type;
-          const index = parseInt(btn.dataset.index);
-          if (confirm('Удалить?')) {
-            if (type === 'service') services.splice(index, 1);
-            else if (type === 'news') news.splice(index, 1);
-            else if (type === 'team') team.splice(index, 1);
-            else if (type === 'email') emails.splice(index, 1);
-            saveAll();
-          }
-        };
-      });
-    }
-
-    function attachLikeListeners() {
-      document.querySelectorAll('.btn-like').forEach(btn => {
-        btn.onclick = () => {
-          const type = btn.dataset.type;
-          const index = parseInt(btn.dataset.index);
-          const key = `${type}-${index}`;
-          if (likes[key]) return;
-          likes[key] = true;
-          if (!news[index].likes) news[index].likes = 0;
-          news[index].likes++;
-          saveAll();
-        };
-      });
-    }
-
-    // === ДОБАВЛЕНИЕ ===
-    function addService() {
-      const title = document.getElementById('serviceTitle').value.trim();
-      const photo = document.getElementById('servicePhoto').value.trim();
-      const desc = document.getElementById('serviceDesc').value.trim();
-      const author = document.getElementById('serviceAuthor').value.trim() || 'Админ';
-      if (title && desc) {
-        services.push({ title, photo, description: desc, author });
-        saveAll();
-        document.getElementById('serviceTitle').value = '';
-        document.getElementById('servicePhoto').value = '';
-        document.getElementById('serviceDesc').value = '';
-      } else alert('Заполните название и описание');
-    }
-
-    function addNews() {
-      const title = document.getElementById('newsTitle').value.trim();
-      const photo = document.getElementById('newsPhoto').value.trim();
-      const desc = document.getElementById('newsDesc').value.trim();
-      const author = document.getElementById('newsAuthor').value.trim() || 'Админ';
-      if (title && desc) {
-        news.push({ title, photo, description: desc, author, likes: 0 });
-        saveAll();
-        document.getElementById('newsTitle').value = '';
-        document.getElementById('newsPhoto').value = '';
-        document.getElementById('newsDesc').value = '';
-      } else alert('Заполните заголовок и текст');
-    }
-
-    function addTeam() {
-      const name = document.getElementById('teamName').value.trim();
-      const photo = document.getElementById('teamPhoto').value.trim();
-      const role = document.getElementById('teamRole').value.trim();
-      const desc = document.getElementById('teamDesc').value.trim();
-      if (name && role && desc) {
-        team.push({ name, photo, role, description: desc });
-        saveAll();
-        document.getElementById('teamName').value = '';
-        document.getElementById('teamPhoto').value = '';
-        document.getElementById('teamRole').value = '';
-        document.getElementById('teamDesc').value = '';
-      } else alert('Заполните все поля');
-    }
-
-    function addEmail() {
-      const name = document.getElementById('emailName').value.trim();
-      const role = document.getElementById('emailRole').value.trim();
-      const email = document.getElementById('emailAddress').value.trim();
-      if (name && role && email) {
-        emails.push({ name, role, email });
-        saveAll();
-        document.getElementById('emailName').value = '';
-        document.getElementById('emailRole').value = '';
-        document.getElementById('emailAddress').value = '';
-      } else alert('Заполните все поля');
     }
 
     // === ВХОД ===
     document.getElementById('loginBtn').onclick = () => {
-      if (isLoggedIn) {
+      if (state.isLoggedIn) {
         toggleAdminPanel(false);
       } else {
         document.getElementById('loginModal').style.display = 'flex';
@@ -562,7 +537,6 @@
       }
     };
 
-    // Закрытие модалки по клику вне
     document.getElementById('loginModal').onclick = (e) => {
       if (e.target === document.getElementById('loginModal')) {
         document.getElementById('loginModal').style.display = 'none';
@@ -572,7 +546,7 @@
     // === ЗАПУСК ===
     initSnow();
     renderAll();
-    if (isLoggedIn) {
+    if (state.isLoggedIn) {
       toggleAdminPanel(true);
     }
   </script>
