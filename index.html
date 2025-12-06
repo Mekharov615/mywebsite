@@ -3,32 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Услуги & Новости — Админ-панель</title>
+  <title>SMM&ЦОМ</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg1: #0E0A14;
-      --bg2: #1C1024;
-      --bg3: #2A1836;
-      --card: #0f0f14;
-      --card-2: #15131b;
-      --muted: #a9a9b2;
+      --bg1: #0A0F2C;
+      --bg2: #0E153A;
+      --bg3: #121B48;
+      --card: #0f1428;
+      --card-2: #151b30;
+      --muted: #a9b1c6;
       --primary: #4f46e5;
-      --primary-2: #7c3aed;
-      --accent: #22d3ee; /* Голубой акцент */
+      --accent: #22d3ee;
       --good: #22c55e;
-      --bad: #ef4444;
-      --plus: #f59e0b;
-      --btn: #2563eb;
-      --btn-2: #1d4ed8;
+      --snow: #e0f7ff;
+      --like: #ff4d94;
+      --delete: #ef4444;
       --shadow: 0 20px 60px rgba(0,0,0,.55), 0 6px 18px rgba(0,0,0,.35);
       --radius-xl: 26px;
       --radius-lg: 18px;
       --radius-md: 12px;
     }
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow-x: hidden; }
     body {
       font-family: 'Montserrat', system-ui, sans-serif;
       color: #fff;
@@ -38,39 +36,62 @@
         radial-gradient(900px 600px at 110% 70%, rgba(34,211,238,.18), transparent 60%),
         linear-gradient(180deg, var(--bg1), var(--bg2) 40%, var(--bg3));
       background-attachment: fixed;
+      position: relative;
     }
 
-    .container { width: min(1120px, 92%); margin: 0 auto; padding: 20px 0; }
+    #snow {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+    }
+
+    .container { width: min(1120px, 92%); margin: 0 auto; padding: 20px 0; position: relative; z-index: 2; }
     .topbar {
       position: sticky; top: 0; z-index: 50;
       backdrop-filter: blur(10px);
-      background: linear-gradient(to bottom, rgba(20,12,28,.85), rgba(20,12,28,.55));
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(to bottom, rgba(10,15,44,.9), rgba(10,15,44,.6));
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
     .brand {
       display: flex; justify-content: space-between; align-items: center;
       padding: 16px 0;
-      font-weight: 800; font-size: 18px;
+      font-weight: 800; font-size: 20px;
+      text-shadow: 0 0 10px rgba(34,211,238,0.4);
     }
     .section-title {
       font-size: clamp(26px, 4vw, 40px); font-weight: 800;
-      margin: 26px 0 18px; text-align: center;
+      margin: 36px 0 24px; text-align: center;
+      color: var(--snow);
+      text-shadow: 0 0 12px rgba(255,255,255,0.2);
     }
     .cards {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 24px; margin-bottom: 40px;
+      gap: 28px; margin-bottom: 40px;
     }
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      background: linear-gradient(180deg, rgba(20,30,60,.6), rgba(15,20,40,.7));
+      border: 1px solid rgba(255,255,255,.08);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
       padding: 20px;
       transition: transform 0.25s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .card:hover { transform: translateY(-4px); }
+    .card:hover { transform: translateY(-6px); box-shadow: 0 26px 70px rgba(0,0,0,.7); }
+    .card-img {
+      width: 100%; height: 180px; border-radius: var(--radius-lg);
+      background: #000;
+      margin-bottom: 16px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .card-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block;
+    }
     .card h3 {
       font-size: 18px; margin: 0 0 10px;
       display: flex; align-items: center; gap: 8px;
+      color: var(--snow);
     }
     .card p {
       color: var(--muted); font-size: 14px; line-height: 1.5;
@@ -79,44 +100,65 @@
       font-size: 13px; color: var(--accent); margin-top: 10px;
       display: flex; align-items: center; gap: 4px;
     }
+    .buy-btn, .like-btn, .delete-btn {
+      padding: 8px 14px; border-radius: 10px; font-weight: bold; font-size: 14px;
+      cursor: pointer; margin-top: 10px; display: inline-flex; align-items: center; gap: 6px;
+      text-decoration: none; border: none;
+    }
     .buy-btn {
       background: linear-gradient(180deg, var(--accent), #0ea5e9);
-      color: #000; font-weight: 800; border: none;
-      padding: 10px 16px; border-radius: 12px;
-      cursor: pointer; margin-top: 12px;
-      display: inline-flex; align-items: center; gap: 6px;
-      text-decoration: none; font-size: 15px;
-      transition: filter 0.2s;
+      color: #000;
     }
-    .buy-btn:hover { filter: brightness(1.1); }
+    .like-btn {
+      background: rgba(255,77,148,0.15);
+      color: var(--like);
+      border: 1px solid rgba(255,77,148,0.3);
+    }
+    .like-btn.liked {
+      background: rgba(255,77,148,0.3);
+      color: white;
+    }
+    .delete-btn {
+      background: rgba(239,68,68,0.15);
+      color: var(--delete);
+      border: 1px solid rgba(239,68,68,0.3);
+      font-size: 12px;
+    }
+    .card-actions {
+      display: flex; gap: 8px; margin-top: 12px;
+      flex-wrap: wrap;
+    }
 
     .admin-panel {
-      background: rgba(10,10,20,0.7);
+      background: rgba(10,15,40,0.85);
+      border: 1px solid rgba(34,211,238,0.3);
       border-radius: var(--radius-xl);
-      padding: 24px; margin: 30px 0;
-      border: 1px solid rgba(34,211,238,0.2);
+      padding: 26px; margin: 30px 0;
+      box-shadow: var(--shadow);
     }
     .admin-form { display: grid; gap: 14px; margin-top: 16px; }
     .admin-form input, .admin-form textarea, .admin-form button {
-      padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(0,0,0,0.3); color: white; font-size: 15px;
+      padding: 12px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(5,10,25,0.7);
+      color: white; font-size: 15px;
+      width: 100%;
     }
     .admin-form button {
-      background: var(--accent); color: #000; font-weight: bold;
+      background: linear-gradient(135deg, var(--accent), #00bfff);
+      color: #000; font-weight: bold;
       cursor: pointer;
+      border: none;
     }
     .login-form {
       background: var(--card);
-      padding: 24px; border-radius: var(--radius-lg);
-      max-width: 400px; margin: 40px auto;
+      padding: 28px; border-radius: var(--radius-lg);
+      max-width: 420px; margin: 50px auto;
       box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.08);
     }
     .hidden { display: none !important; }
 
-    footer {
-      text-align: center; padding: 30px 0; color: var(--muted);
-      border-top: 1px solid rgba(255,255,255,.06);
-    }
     .nav-btn {
       background: rgba(34,211,238,0.2);
       color: var(--accent);
@@ -126,106 +168,157 @@
       cursor: pointer;
       font-weight: 600;
     }
+    .nav-btn:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    footer {
+      text-align: center; padding: 30px 0; color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,.08);
+      position: relative; z-index: 2;
+    }
   </style>
 </head>
 <body>
 
+  <canvas id="snow"></canvas>
+
   <div class="topbar">
     <div class="container">
       <div class="brand">
-        <span>✨ Услуги & Новости</span>
-        <button id="loginBtn" class="nav-btn">🔒 Войти как админ</button>
+        <span>❄️ SMM&ЦОМ</span>
+        <button id="loginBtn" class="nav-btn">🔒 Админка</button>
       </div>
     </div>
   </div>
 
   <main class="container">
-    <h2 class="section-title">💼 Наши услуги</h2>
+    <h2 class="section-title">💼 Услуги</h2>
     <section class="cards" id="services"></section>
 
-    <h2 class="section-title">📰 Объявления и новости</h2>
+    <h2 class="section-title">📰 Новости и объявления</h2>
     <section class="cards" id="news"></section>
+
+    <h2 class="section-title">👥 Состав ЦОМ</h2>
+    <section class="cards" id="team"></section>
   </main>
 
-  <!-- Форма входа -->
   <div id="loginModal" class="hidden">
     <div class="login-form">
-      <h3 style="text-align:center">👑 Вход в админ-панель</h3>
-      <input type="text" id="loginUser" placeholder="Логин (Admin)" />
-      <input type="password" id="loginPass" placeholder="Пароль (admins123)" />
-      <button id="doLogin">Войти</button>
-      <p id="loginError" style="color:var(--bad); margin-top:8px; font-size:13px; text-align:center;"></p>
+      <h3 style="text-align:center; margin-bottom:20px">👑 Вход в админ-панель</h3>
+      <input type="text" id="loginUser" />
+      <input type="password" id="loginPass" />
+      <button id="doLogin" style="margin-top:12px">Войти</button>
+      <p id="loginError" style="color:#ef4444; margin-top:12px; font-size:13px; text-align:center;"></p>
     </div>
   </div>
 
-  <!-- Админ-панель -->
   <div id="adminPanel" class="admin-panel hidden">
-    <h3>🛠️ Добавить услугу</h3>
+    <h3>➕ Добавить услугу</h3>
     <div class="admin-form">
       <input type="text" id="serviceTitle" placeholder="Название услуги" />
+      <input type="text" id="servicePhoto" placeholder="URL фото (https://...)" />
       <textarea id="serviceDesc" placeholder="Описание услуги" rows="3"></textarea>
-      <input type="text" id="serviceAuthor" placeholder="Автор (по умолчанию: Админ)" value="Админ" />
-      <button id="addService">➕ Добавить услугу</button>
+      <input type="text" id="serviceAuthor" placeholder="Автор" value="Админ" />
+      <button id="addService">Добавить услугу</button>
     </div>
 
     <h3 style="margin-top:30px">📣 Добавить новость/объявление</h3>
     <div class="admin-form">
       <input type="text" id="newsTitle" placeholder="Заголовок" />
-      <textarea id="newsDesc" placeholder="Текст новости или объявления" rows="3"></textarea>
+      <input type="text" id="newsPhoto" placeholder="URL фото (https://...)" />
+      <textarea id="newsDesc" placeholder="Текст" rows="3"></textarea>
       <input type="text" id="newsAuthor" placeholder="Автор" value="Админ" />
-      <button id="addNews">➕ Добавить новость</button>
+      <button id="addNews">Добавить новость</button>
     </div>
 
-    <button id="logoutBtn" style="margin-top:20px; background: var(--bad); color:white;">🚪 Выйти</button>
+    <h3 style="margin-top:30px">👥 Добавить участника ЦОМ</h3>
+    <div class="admin-form">
+      <input type="text" id="teamName" placeholder="ФИО" />
+      <input type="text" id="teamPhoto" placeholder="URL фото (https://...)" />
+      <input type="text" id="teamRole" placeholder="Должность" />
+      <textarea id="teamDesc" placeholder="Описание" rows="3"></textarea>
+      <button id="addTeam">Добавить в состав</button>
+    </div>
+
+    <button id="logoutBtn" style="margin-top:24px; background: #ef4444; color:white; padding:12px; border-radius:12px; font-weight:bold;">🚪 Выйти</button>
   </div>
 
   <footer>
-    &copy; 2025 | ✨ Услуги & Новости. Все права защищены.
+    &copy; 2025 SMM&ЦОМ ❄️ Все права защищены.
   </footer>
 
   <script>
-    // Данные (в реальном проекте — в БД, здесь — localStorage)
     let services = JSON.parse(localStorage.getItem('services') || '[]');
     let news = JSON.parse(localStorage.getItem('news') || '[]');
+    let team = JSON.parse(localStorage.getItem('team') || '[]');
+    let likes = JSON.parse(localStorage.getItem('likes') || '{}'); // { "news-0": true, ... }
     let isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
 
     const WA_LINK = 'https://wa.me/996999188001';
 
-    // Рендер карточек
     function renderServices() {
       const container = document.getElementById('services');
       container.innerHTML = services.map((item, i) => `
         <div class="card">
+          ${item.photo ? `<div class="card-img"><img src="${item.photo}" alt="Фото"></div>` : ''}
           <h3>💼 ${item.title}</h3>
           <p>${item.description}</p>
           <div class="card-author">👤 ${item.author || 'Админ'}</div>
-          <a href="${WA_LINK}" target="_blank" class="buy-btn">🛒 Купить</a>
+          <div class="card-actions">
+            <a href="${WA_LINK}" target="_blank" class="buy-btn">🛒 Купить</a>
+            ${isLoggedIn ? `<button class="delete-btn" data-type="service" data-index="${i}">🗑️ Удалить</button>` : ''}
+          </div>
         </div>
       `).join('');
+      if (isLoggedIn) attachDeleteListeners();
     }
 
     function renderNews() {
       const container = document.getElementById('news');
-      container.innerHTML = news.map(item => `
+      container.innerHTML = news.map((item, i) => `
         <div class="card">
+          ${item.photo ? `<div class="card-img"><img src="${item.photo}" alt="Фото"></div>` : ''}
           <h3>📢 ${item.title}</h3>
           <p>${item.description}</p>
           <div class="card-author">👤 ${item.author || 'Админ'}</div>
+          <div class="card-actions">
+            <button class="like-btn ${likes[`news-${i}`] ? 'liked' : ''}" data-type="news" data-index="${i}">
+              ${likes[`news-${i}`] ? '❤️' : '🤍'} Лайк (${item.likes || 0})
+            </button>
+            ${isLoggedIn ? `<button class="delete-btn" data-type="news" data-index="${i}">🗑️ Удалить</button>` : ''}
+          </div>
         </div>
       `).join('');
+      if (isLoggedIn) attachDeleteListeners();
+      attachLikeListeners();
     }
 
-    // Сохранение
-    function saveServices() {
+    function renderTeam() {
+      const container = document.getElementById('team');
+      container.innerHTML = team.map((item, i) => `
+        <div class="card">
+          ${item.photo ? `<div class="card-img"><img src="${item.photo}" alt="Фото"></div>` : ''}
+          <h3>👤 ${item.name}</h3>
+          <p><strong>${item.role}</strong></p>
+          <p>${item.description}</p>
+          ${isLoggedIn ? `<div style="margin-top:12px;"><button class="delete-btn" data-type="team" data-index="${i}">🗑️ Удалить</button></div>` : ''}
+        </div>
+      `).join('');
+      if (isLoggedIn) attachDeleteListeners();
+    }
+
+    function saveData() {
       localStorage.setItem('services', JSON.stringify(services));
-      renderServices();
-    }
-    function saveNews() {
       localStorage.setItem('news', JSON.stringify(news));
+      localStorage.setItem('team', JSON.stringify(team));
+      localStorage.setItem('likes', JSON.stringify(likes));
+      renderServices();
       renderNews();
+      renderTeam();
     }
 
-    // Показ/скрытие админки
     function toggleAdminPanel(show) {
       document.getElementById('adminPanel').classList.toggle('hidden', !show);
       document.getElementById('loginModal').classList.add('hidden');
@@ -236,20 +329,120 @@
       } else {
         localStorage.setItem('adminLoggedIn', 'false');
         isLoggedIn = false;
-        document.getElementById('loginBtn').textContent = '🔒 Войти как админ';
+        document.getElementById('loginBtn').textContent = '🔒 Админка';
       }
+      // Перерисовать всё с учётом режима
+      renderServices();
+      renderNews();
+      renderTeam();
     }
 
-    // Инициализация
+    function attachDeleteListeners() {
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.onclick = () => {
+          const type = btn.dataset.type;
+          const index = parseInt(btn.dataset.index);
+          if (confirm('Точно удалить?')) {
+            if (type === 'service') services.splice(index, 1);
+            else if (type === 'news') news.splice(index, 1);
+            else if (type === 'team') team.splice(index, 1);
+            // Сбросить лайки для news при удалении
+            if (type === 'news') {
+              Object.keys(likes).forEach(key => {
+                if (key.startsWith('news-')) delete likes[key];
+              });
+              // Пересчитать лайки (опционально — упрощённо)
+            }
+            saveData();
+          }
+        };
+      });
+    }
+
+    function attachLikeListeners() {
+      document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.onclick = () => {
+          const type = btn.dataset.type;
+          const index = parseInt(btn.dataset.index);
+          const key = `${type}-${index}`;
+
+          if (likes[key]) {
+            // Убрать лайк (опционально — можно запретить)
+            return;
+          }
+
+          likes[key] = true;
+          if (!news[index].likes) news[index].likes = 0;
+          news[index].likes += 1;
+
+          saveData();
+        };
+      });
+    }
+
+    function initSnow() {
+      const canvas = document.getElementById('snow');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const flakes = [];
+      const flakeCount = 150;
+
+      class Flake {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * -canvas.height;
+          this.size = Math.random() * 4 + 1;
+          this.speed = Math.random() * 3 + 1;
+          this.wind = Math.random() * 2 - 1;
+        }
+        update() {
+          this.y += this.speed;
+          this.x += this.wind;
+          if (this.y > canvas.height) {
+            this.y = -10;
+            this.x = Math.random() * canvas.width;
+          }
+        }
+        draw() {
+          ctx.fillStyle = 'rgba(224, 247, 255, 0.85)';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < flakeCount; i++) {
+        flakes.push(new Flake());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        flakes.forEach(flake => {
+          flake.update();
+          flake.draw();
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    }
+
     function init() {
       if (isLoggedIn) {
         toggleAdminPanel(true);
       }
       renderServices();
       renderNews();
+      renderTeam();
+      initSnow();
     }
 
-    // Обработчики
     document.getElementById('loginBtn').addEventListener('click', () => {
       if (isLoggedIn) {
         toggleAdminPanel(false);
@@ -277,31 +470,43 @@
 
     document.getElementById('addService').addEventListener('click', () => {
       const title = document.getElementById('serviceTitle').value.trim();
+      const photo = document.getElementById('servicePhoto').value.trim();
       const desc = document.getElementById('serviceDesc').value.trim();
       const author = document.getElementById('serviceAuthor').value.trim() || 'Админ';
       if (title && desc) {
-        services.push({ title, description: desc, author });
-        saveServices();
-        document.getElementById('serviceTitle').value = '';
-        document.getElementById('serviceDesc').value = '';
+        services.push({ title, photo, description: desc, author });
+        saveData();
+        ['serviceTitle', 'servicePhoto', 'serviceDesc'].forEach(id => document.getElementById(id).value = '');
       }
     });
 
     document.getElementById('addNews').addEventListener('click', () => {
       const title = document.getElementById('newsTitle').value.trim();
+      const photo = document.getElementById('newsPhoto').value.trim();
       const desc = document.getElementById('newsDesc').value.trim();
       const author = document.getElementById('newsAuthor').value.trim() || 'Админ';
       if (title && desc) {
-        news.push({ title, description: desc, author });
-        saveNews();
-        document.getElementById('newsTitle').value = '';
-        document.getElementById('newsDesc').value = '';
+        news.push({ title, photo, description: desc, author, likes: 0 });
+        saveData();
+        ['newsTitle', 'newsPhoto', 'newsDesc'].forEach(id => document.getElementById(id).value = '');
       }
     });
 
-    // Запуск
+    document.getElementById('addTeam').addEventListener('click', () => {
+      const name = document.getElementById('teamName').value.trim();
+      const photo = document.getElementById('teamPhoto').value.trim();
+      const role = document.getElementById('teamRole').value.trim();
+      const desc = document.getElementById('teamDesc').value.trim();
+      if (name && role && desc) {
+        team.push({ name, photo, role, description: desc });
+        saveData();
+        ['teamName', 'teamPhoto', 'teamRole', 'teamDesc'].forEach(id => document.getElementById(id).value = '');
+      }
+    });
+
     init();
   </script>
 </body>
 </html>
 
+  
